@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -85,6 +86,8 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto getItemById(Long itemId, Long userId) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Item not found"));
+
+        Hibernate.initialize(item.getOwner());
 
         ItemDto itemDto = ItemMapper.toItemDto(item);
 

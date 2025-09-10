@@ -17,8 +17,8 @@ INSERT INTO items (name, description, is_available, owner_id, request_id) VALUES
 
 -- Тестовые бронирования
 INSERT INTO bookings (start_date, end_date, item_id, booker_id, status) VALUES
-(CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '1' DAY, 1, 2, 'APPROVED'),
-(CURRENT_TIMESTAMP + INTERVAL '2' DAY, CURRENT_TIMESTAMP + INTERVAL '3' DAY, 2, 1, 'WAITING');
+(CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + 1, 1, 2, 'APPROVED'),
+(CURRENT_TIMESTAMP + 2, CURRENT_TIMESTAMP + 3, 2, 1, 'WAITING');
 
 -- Тестовые комментарии
 INSERT INTO comments (text, item_id, author_id, created) VALUES
