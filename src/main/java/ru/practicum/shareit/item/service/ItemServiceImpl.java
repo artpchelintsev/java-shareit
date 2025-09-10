@@ -88,24 +88,26 @@ public class ItemServiceImpl implements ItemService {
 
         ItemDto itemDto = ItemMapper.toItemDto(item);
 
-        if (item.getOwner().getId().equals(userId)) {
+        if (item.getOwner() != null && item.getOwner().getId().equals(userId)) {
             LocalDateTime now = LocalDateTime.now();
 
             List<Booking> lastBookings = bookingRepository.findLastBookings(itemId, now);
-            if (!lastBookings.isEmpty()) {
+            if (lastBookings != null && !lastBookings.isEmpty()) {
                 itemDto.setLastBooking(BookingMapper.toBookingShortDto(lastBookings.get(0)));
             }
 
             List<Booking> nextBookings = bookingRepository.findNextBookings(itemId, now);
-            if (!nextBookings.isEmpty()) {
+            if (nextBookings != null && !nextBookings.isEmpty()) {
                 itemDto.setNextBooking(BookingMapper.toBookingShortDto(nextBookings.get(0)));
             }
         }
 
         List<Comment> comments = commentRepository.findByItemId(itemId);
-        itemDto.setComments(comments.stream()
-                .map(CommentMapper::toCommentDto)
-                .collect(Collectors.toList()));
+        if (comments != null) {
+            itemDto.setComments(comments.stream()
+                    .map(CommentMapper::toCommentDto)
+                    .collect(Collectors.toList()));
+        }
 
         return itemDto;
     }
