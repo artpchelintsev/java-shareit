@@ -45,4 +45,10 @@ public class ErrorHandler {
     public ErrorResponse handleException(Exception e) {
         return new ErrorResponse("Internal server error");
     }
+
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleForbiddenException(ForbiddenException e) {
+        return new ErrorResponse(e.getMessage());
+    }
 }
