@@ -63,6 +63,6 @@ public class ErrorHandler {
     @ExceptionHandler(DataAccessException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleDataAccessException(DataAccessException e) {
-        return new ErrorResponse("Database access error: " + e.getMessage());
+        return new ErrorResponse("Database access error: " + e);
     }
 }
