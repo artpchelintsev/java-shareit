@@ -1,6 +1,8 @@
 package ru.practicum.shareit.exception;
 
 import jakarta.validation.ConstraintViolationException;
+import org.hibernate.LazyInitializationException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -44,5 +46,23 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(Exception e) {
         return new ErrorResponse("Internal server error");
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleForbiddenException(ForbiddenException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler(LazyInitializationException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleLazyInitializationException(LazyInitializationException e) {
+        return new ErrorResponse("Lazy loading error: " + e.getMessage());
+    }
+
+    @ExceptionHandler(DataAccessException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleDataAccessException(DataAccessException e) {
+        return new ErrorResponse("Database access error: " + e);
     }
 }
