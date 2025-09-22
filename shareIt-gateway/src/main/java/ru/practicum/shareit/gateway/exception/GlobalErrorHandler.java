@@ -35,6 +35,12 @@ public class GlobalErrorHandler {
                 .body(new ErrorResponse("Internal server error"));
     }
 
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(ValidationException ex) {
+        log.warn("Business validation error: {}", ex.getMessage());
+        return ResponseEntity.status(400).body(new ErrorResponse(ex.getMessage()));
+    }
+
     public record ErrorResponse(String error) {
     }
 }
