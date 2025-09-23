@@ -92,4 +92,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByOwnerIdAndStatus(@Param("ownerId") Long ownerId,
                                          @Param("status") BookingStatus status,
                                          Pageable pageable);
+
+    @Query("SELECT CASE WHEN COUNT(b) > 0 THEN true ELSE false END FROM Booking b " +
+            "WHERE b.item.id = :itemId AND b.booker.id = :userId " +
+            "AND b.status = :status AND b.end < :now")
+    boolean existsByItemIdAndBookerIdAndStatusAndEndBefore(
+            @Param("itemId") Long itemId,
+            @Param("userId") Long userId,
+            @Param("status") BookingStatus status,
+            @Param("now") LocalDateTime now);
+
 }

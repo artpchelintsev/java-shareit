@@ -174,8 +174,5 @@ public class BookingServiceImpl implements BookingService {
         if (start.isEqual(end)) {
             throw new ValidationException("Start and end dates cannot be equal");
         }
-        if (start.isBefore(LocalDateTime.now())) {
-            throw new ValidationException("Start date cannot be in the past");
-        }
     }
 }

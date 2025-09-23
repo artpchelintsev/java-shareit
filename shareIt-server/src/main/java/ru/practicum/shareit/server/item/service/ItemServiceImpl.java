@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.server.booking.Booking;
+import ru.practicum.shareit.server.booking.BookingStatus;
 import ru.practicum.shareit.server.booking.mapper.BookingMapper;
 import ru.practicum.shareit.server.booking.repository.BookingRepository;
 import ru.practicum.shareit.server.exception.NotFoundException;
@@ -172,22 +173,23 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new NotFoundException("Item not found"));
         User author = getUser(userId);
 
-        boolean hasApprovedBooking = bookingRepository.existsApprovedPastBooking(
-                itemId, userId, LocalDateTime.now());
+        // Упрощенная, но строгая проверка
+        LocalDateTime now = LocalDateTime.now();
+        boolean canComment = bookingRepository.existsByItemIdAndBookerIdAndStatusAndEndBefore(
+                itemId, userId, BookingStatus.APPROVED, now);
 
-        if (!hasApprovedBooking) {
-            throw new ValidationException("User must have approved booking for this item to leave a comment");
+        if (!canComment) {
+            throw new ValidationException("User can only comment on items with completed approved bookings");
         }
 
         if (commentDto.getText() == null || commentDto.getText().isBlank()) {
             throw new ValidationException("Comment text cannot be empty");
         }
 
-        Comment comment = new Comment();
-        comment.setText(commentDto.getText());
+        Comment comment = CommentMapper.toComment(commentDto);
         comment.setItem(item);
         comment.setAuthor(author);
-        comment.setCreated(LocalDateTime.now());
+        comment.setCreated(now);
 
         Comment savedComment = commentRepository.save(comment);
         return CommentMapper.toCommentDto(savedComment);

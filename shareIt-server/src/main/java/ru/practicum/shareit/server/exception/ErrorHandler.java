@@ -65,4 +65,10 @@ public class ErrorHandler {
     public ErrorResponse handleDataAccessException(DataAccessException e) {
         return new ErrorResponse("Database access error: " + e);
     }
+
+    @ExceptionHandler(ValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleValidationException(ValidationException e) {
+        return new ErrorResponse(e.getMessage());
+    }
 }

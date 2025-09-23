@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ShareItClientTest {
 
@@ -75,7 +74,8 @@ class ShareItClientTest {
 
         // When
         ParameterizedTypeReference<List<UserDto>> typeReference =
-                new ParameterizedTypeReference<List<UserDto>>() {};
+                new ParameterizedTypeReference<List<UserDto>>() {
+                };
         Mono<List<UserDto>> result = shareItClient.get("/users", typeReference, 1L);
 
         // Then
