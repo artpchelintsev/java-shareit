@@ -49,7 +49,8 @@ public class UserController {
     public Mono<ResponseEntity<List<UserDto>>> getAllUsers() {
         log.info("Getting all users");
         ParameterizedTypeReference<List<UserDto>> typeReference =
-                new ParameterizedTypeReference<List<UserDto>>() {};
+                new ParameterizedTypeReference<List<UserDto>>() {
+                };
         return shareItClient.get("/users", typeReference, null)
                 .map(ResponseEntity::ok)
                 .doOnError(error -> log.error("Error getting all users: {}", error.getMessage()));

@@ -59,7 +59,8 @@ public class ItemController {
         log.info("Getting all items for owner {} from {} size {}", ownerId, from, size);
         String path = String.format("/items?from=%d&size=%d", from, size);
         ParameterizedTypeReference<List<ItemDto>> typeReference =
-                new ParameterizedTypeReference<List<ItemDto>>() {};
+                new ParameterizedTypeReference<List<ItemDto>>() {
+                };
         return shareItClient.get(path, typeReference, ownerId)
                 .map(ResponseEntity::ok)
                 .doOnError(error -> log.error("Error getting owner items: {}", error.getMessage()));
@@ -74,7 +75,8 @@ public class ItemController {
         log.info("Searching items with text: '{}'", text);
         String path = String.format("/items/search?text=%s&from=%d&size=%d", text, from, size);
         ParameterizedTypeReference<List<ItemDto>> typeReference =
-                new ParameterizedTypeReference<List<ItemDto>>() {};
+                new ParameterizedTypeReference<List<ItemDto>>() {
+                };
         return shareItClient.get(path, typeReference, userId)
                 .map(ResponseEntity::ok)
                 .doOnError(error -> log.error("Error searching items: {}", error.getMessage()));

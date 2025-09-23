@@ -191,5 +191,19 @@ class UserServiceImplTest {
         verify(userRepository, times(1)).deleteById(1L);
     }
 
+    @Test
+    void updateUser_shouldNotChangeUser_whenDtoHasNullFields() {
+        UserDto updateDto = new UserDto();
+        // email и name оставляем null
 
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
+
+        UserDto result = userService.updateUser(1L, updateDto);
+
+        // данные не меняются
+        assertThat(result.getName()).isEqualTo(user.getName());
+        assertThat(result.getEmail()).isEqualTo(user.getEmail());
+        verify(userRepository).save(any(User.class));
+    }
 }

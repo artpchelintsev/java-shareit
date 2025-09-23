@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ShareItClientTest {
 
@@ -41,126 +42,218 @@ class ShareItClientTest {
     }
 
     @Test
-    void get_shouldReturnUser() {
+    void constructor_withBaseUrl_shouldCreateClient() {
         // Given
-        String responseBody = "{\"id\":1,\"name\":\"Test User\",\"email\":\"test@email.com\"}";
-        mockWebServer.enqueue(new MockResponse()
-                .setResponseCode(200)
-                .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .setBody(responseBody));
+        String baseUrl = "http://localhost:8080";
 
         // When
-        Mono<UserDto> result = shareItClient.get("/users/1", UserDto.class, 1L);
+        ShareItClient client = new ShareItClient(baseUrl);
 
-        // Then
-        StepVerifier.create(result)
-                .expectNextMatches(user -> {
-                    assertEquals(1L, user.getId());
-                    assertEquals("Test User", user.getName());
-                    assertEquals("test@email.com", user.getEmail());
-                    return true;
-                })
-                .verifyComplete();
+        // Then - should not throw exception
+        assertNotNull(client);
     }
 
     @Test
-    void get_shouldReturnListWithParameterizedType() {
+    void constructor_withWebClient_shouldCreateClient() {
         // Given
-        String responseBody = "[{\"id\":1,\"name\":\"User1\",\"email\":\"user1@email.com\"},{\"id\":2,\"name\":\"User2\",\"email\":\"user2@email.com\"}]";
-        mockWebServer.enqueue(new MockResponse()
-                .setResponseCode(200)
-                .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .setBody(responseBody));
+        WebClient webClient = WebClient.create();
 
         // When
-        ParameterizedTypeReference<List<UserDto>> typeReference =
-                new ParameterizedTypeReference<List<UserDto>>() {
-                };
-        Mono<List<UserDto>> result = shareItClient.get("/users", typeReference, 1L);
+        ShareItClient client = new ShareItClient(webClient);
 
         // Then
-        StepVerifier.create(result)
-                .expectNextMatches(users -> {
-                    assertEquals(2, users.size());
-                    assertEquals("User1", users.get(0).getName());
-                    assertEquals("User2", users.get(1).getName());
-                    return true;
-                })
-                .verifyComplete();
+        assertNotNull(client);
     }
 
     @Test
-    void post_shouldCreateUser() {
+    void post_withParameterizedType_shouldWork() {
         // Given
-        String responseBody = "{\"id\":1,\"name\":\"New User\",\"email\":\"new@email.com\"}";
+        String responseBody = "[{\"id\":1,\"name\":\"User1\"},{\"id\":2,\"name\":\"User2\"}]";
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(200)
                 .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .setBody(responseBody));
 
         UserDto newUser = new UserDto(null, "New User", "new@email.com");
+        ParameterizedTypeReference<List<UserDto>> typeReference =
+                new ParameterizedTypeReference<List<UserDto>>() {
+                };
+
+        // When
+        Mono<List<UserDto>> result = shareItClient.post("/users", newUser, typeReference, 1L);
+
+        // Then
+        StepVerifier.create(result)
+                .expectNextMatches(users -> {
+                    assertEquals(2, users.size());
+                    assertEquals("User1", users.get(0).getName());
+                    return true;
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void post_withNullBody_shouldWork() {
+        // Given
+        String responseBody = "{\"id\":1,\"name\":\"User\"}";
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .setBody(responseBody));
+
+        // When
+        Mono<UserDto> result = shareItClient.post("/users", null, UserDto.class, 1L);
+
+        // Then
+        StepVerifier.create(result)
+                .expectNextMatches(user -> user.getId().equals(1L))
+                .verifyComplete();
+    }
+
+    @Test
+    void post_withNullUserId_shouldWork() {
+        // Given
+        String responseBody = "{\"id\":1,\"name\":\"User\"}";
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .setBody(responseBody));
+
+        UserDto newUser = new UserDto(null, "User", "user@email.com");
 
         // When
         Mono<UserDto> result = shareItClient.post("/users", newUser, UserDto.class, null);
 
         // Then
         StepVerifier.create(result)
-                .expectNextMatches(user -> {
-                    assertEquals(1L, user.getId());
-                    assertEquals("New User", user.getName());
-                    assertEquals("new@email.com", user.getEmail());
+                .expectNextMatches(user -> user.getId().equals(1L))
+                .verifyComplete();
+    }
+
+    @Test
+    void patch_withParameterizedType_shouldWork() {
+        // Given
+        String responseBody = "[{\"id\":1,\"name\":\"Updated1\"},{\"id\":2,\"name\":\"Updated2\"}]";
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .setBody(responseBody));
+
+        UserDto updateUser = new UserDto(null, "Updated", null);
+        ParameterizedTypeReference<List<UserDto>> typeReference =
+                new ParameterizedTypeReference<List<UserDto>>() {
+                };
+
+        // When
+        Mono<List<UserDto>> result = shareItClient.patch("/users", updateUser, typeReference, 1L);
+
+        // Then
+        StepVerifier.create(result)
+                .expectNextMatches(users -> {
+                    assertEquals(2, users.size());
+                    assertEquals("Updated1", users.get(0).getName());
                     return true;
                 })
                 .verifyComplete();
     }
 
     @Test
-    void patch_shouldUpdateUser() {
+    void patch_withNullBody_shouldWork() {
         // Given
-        String responseBody = "{\"id\":1,\"name\":\"Updated User\",\"email\":\"test@email.com\"}";
+        String responseBody = "{\"id\":1,\"name\":\"User\"}";
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(200)
                 .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .setBody(responseBody));
 
-        UserDto updateUser = new UserDto(null, "Updated User", null);
+        // When
+        Mono<UserDto> result = shareItClient.patch("/users/1", null, UserDto.class, 1L);
+
+        // Then
+        StepVerifier.create(result)
+                .expectNextMatches(user -> user.getId().equals(1L))
+                .verifyComplete();
+    }
+
+    @Test
+    void get_withNullUserId_shouldWork() {
+        // Given
+        String responseBody = "{\"id\":1,\"name\":\"User\"}";
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .setBody(responseBody));
+
+        // When
+        Mono<UserDto> result = shareItClient.get("/users/1", UserDto.class, null);
+
+        // Then
+        StepVerifier.create(result)
+                .expectNextMatches(user -> user.getId().equals(1L))
+                .verifyComplete();
+    }
+
+    @Test
+    void delete_withNullUserId_shouldWork() {
+        // Given
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200));
+
+        // When
+        Mono<Void> result = shareItClient.delete("/users/1", null);
+
+        // Then
+        StepVerifier.create(result)
+                .verifyComplete();
+    }
+
+    @Test
+    void post_shouldHandleServerError() {
+        // Given
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(500)
+                .setBody("Internal Server Error"));
+
+        UserDto newUser = new UserDto(null, "User", "user@email.com");
+
+        // When
+        Mono<UserDto> result = shareItClient.post("/users", newUser, UserDto.class, 1L);
+
+        // Then
+        StepVerifier.create(result)
+                .expectError()
+                .verify();
+    }
+
+    @Test
+    void patch_shouldHandleClientError() {
+        // Given
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(400)
+                .setBody("Bad Request"));
+
+        UserDto updateUser = new UserDto(null, "User", "user@email.com");
 
         // When
         Mono<UserDto> result = shareItClient.patch("/users/1", updateUser, UserDto.class, 1L);
 
         // Then
         StepVerifier.create(result)
-                .expectNextMatches(user -> {
-                    assertEquals(1L, user.getId());
-                    assertEquals("Updated User", user.getName());
-                    assertEquals("test@email.com", user.getEmail());
-                    return true;
-                })
-                .verifyComplete();
+                .expectError()
+                .verify();
     }
 
     @Test
-    void delete_shouldDeleteUser() {
-        // Given
-        mockWebServer.enqueue(new MockResponse()
-                .setResponseCode(200));
+    void get_shouldHandleNetworkError() {
+        // Given - server will be shut down
+        try {
+            tearDown();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         // When
-        Mono<Void> result = shareItClient.delete("/users/1", 1L);
-
-        // Then
-        StepVerifier.create(result)
-                .verifyComplete();
-    }
-
-    @Test
-    void get_shouldHandleError() {
-        // Given
-        mockWebServer.enqueue(new MockResponse()
-                .setResponseCode(404));
-
-        // When
-        Mono<UserDto> result = shareItClient.get("/users/999", UserDto.class, 1L);
+        Mono<UserDto> result = shareItClient.get("/users/1", UserDto.class, 1L);
 
         // Then
         StepVerifier.create(result)

@@ -34,7 +34,8 @@ public class ItemRequestController {
             @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Getting item requests for user {}", userId);
         ParameterizedTypeReference<List<ItemRequestDto>> typeReference =
-                new ParameterizedTypeReference<List<ItemRequestDto>>() {};
+                new ParameterizedTypeReference<List<ItemRequestDto>>() {
+                };
         return shareItClient.get("/requests", typeReference, userId)
                 .map(ResponseEntity::ok)
                 .doOnError(error -> log.error("Error getting user item requests: {}", error.getMessage()));
@@ -48,7 +49,8 @@ public class ItemRequestController {
         log.info("Getting other users item requests for user {} from {} size {}", userId, from, size);
         String path = String.format("/requests/all?from=%d&size=%d", from, size);
         ParameterizedTypeReference<List<ItemRequestDto>> typeReference =
-                new ParameterizedTypeReference<List<ItemRequestDto>>() {};
+                new ParameterizedTypeReference<List<ItemRequestDto>>() {
+                };
         return shareItClient.get(path, typeReference, userId)
                 .map(ResponseEntity::ok)
                 .doOnError(error -> log.error("Error getting other users item requests: {}", error.getMessage()));

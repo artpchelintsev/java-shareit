@@ -7,6 +7,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.server.ShareItServerApp;
 import ru.practicum.shareit.server.exception.ConflictException;
+import ru.practicum.shareit.server.exception.NotFoundException;
 import ru.practicum.shareit.server.user.dto.UserDto;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -60,4 +61,33 @@ class UserServiceImplIntegrationTest {
         assertEquals("Updated", updatedUser.getName());
         assertEquals("original@email.com", updatedUser.getEmail());
     }
+
+    @Test
+    void updateUser_shouldThrowConflictException_whenEmailAlreadyExists() {
+        UserDto user1 = userService.createUser(new UserDto(null, "User1", "user1@email.com"));
+        UserDto user2 = userService.createUser(new UserDto(null, "User2", "user2@email.com"));
+
+        UserDto updateDto = new UserDto(null, null, "user1@email.com");
+
+        assertThrows(ConflictException.class, () -> userService.updateUser(user2.getId(), updateDto));
+    }
+
+    @Test
+    void getUserById_shouldReturnUser() {
+        UserDto createdUser = userService.createUser(new UserDto(null, "Test", "test@email.com"));
+        UserDto fetchedUser = userService.getUserById(createdUser.getId());
+
+        assertEquals(createdUser.getId(), fetchedUser.getId());
+    }
+
+    @Test
+    void deleteUser_shouldRemoveUser() {
+        UserDto createdUser = userService.createUser(new UserDto(null, "Test", "test@email.com"));
+        userService.deleteUser(createdUser.getId());
+
+        assertThrows(NotFoundException.class, () -> userService.getUserById(createdUser.getId()));
+    }
+
+
+
 }

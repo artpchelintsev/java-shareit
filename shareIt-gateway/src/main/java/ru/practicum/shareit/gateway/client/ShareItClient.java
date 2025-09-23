@@ -1,13 +1,12 @@
 package ru.practicum.shareit.gateway.client;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-
-import jakarta.annotation.PostConstruct;
 
 @Service
 public class ShareItClient {

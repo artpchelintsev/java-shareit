@@ -59,7 +59,8 @@ public class BookingController {
         log.info("Getting user bookings for user {} with state {}", userId, state);
         String path = String.format("/bookings?state=%s&from=%d&size=%d", state, from, size);
         ParameterizedTypeReference<List<BookingDto>> typeReference =
-                new ParameterizedTypeReference<List<BookingDto>>() {};
+                new ParameterizedTypeReference<List<BookingDto>>() {
+                };
         return shareItClient.get(path, typeReference, userId)
                 .map(ResponseEntity::ok)
                 .doOnError(error -> log.error("Error getting user bookings: {}", error.getMessage()));
@@ -74,7 +75,8 @@ public class BookingController {
         log.info("Getting owner bookings for user {} with state {}", userId, state);
         String path = String.format("/bookings/owner?state=%s&from=%d&size=%d", state, from, size);
         ParameterizedTypeReference<List<BookingDto>> typeReference =
-                new ParameterizedTypeReference<List<BookingDto>>() {};
+                new ParameterizedTypeReference<List<BookingDto>>() {
+                };
         return shareItClient.get(path, typeReference, userId)
                 .map(ResponseEntity::ok)
                 .doOnError(error -> log.error("Error getting owner bookings: {}", error.getMessage()));

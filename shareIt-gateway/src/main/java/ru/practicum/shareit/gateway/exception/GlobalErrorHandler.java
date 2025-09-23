@@ -42,5 +42,8 @@ public class GlobalErrorHandler {
     }
 
     public record ErrorResponse(String error) {
+        public String getError() {
+            return error;
+        }
     }
 }
