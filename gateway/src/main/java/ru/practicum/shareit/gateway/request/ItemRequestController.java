@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import ru.practicum.shareit.gateway.client.ShareItClient;
 import ru.practicum.shareit.gateway.request.dto.ItemRequestDto;
+import ru.practicum.shareit.gateway.util.GatewayConstants;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class ItemRequestController {
     @PostMapping
     public Mono<ResponseEntity<ItemRequestDto>> createItemRequest(
             @Valid @RequestBody ItemRequestDto.ItemRequestCreateDto itemRequestDto,
-            @RequestHeader("X-Sharer-User-Id") Long userId) {
+            @RequestHeader(GatewayConstants.USER_ID_HEADER) Long userId) {
         log.info("Creating item request for user {}: {}", userId, itemRequestDto);
         return shareItClient.post("/requests", itemRequestDto, ItemRequestDto.class, userId)
                 .map(ResponseEntity::ok)
@@ -31,7 +32,7 @@ public class ItemRequestController {
 
     @GetMapping
     public Mono<ResponseEntity<List<ItemRequestDto>>> getUserItemRequests(
-            @RequestHeader("X-Sharer-User-Id") Long userId) {
+            @RequestHeader(GatewayConstants.USER_ID_HEADER) Long userId) {
         log.info("Getting item requests for user {}", userId);
         ParameterizedTypeReference<List<ItemRequestDto>> typeReference =
                 new ParameterizedTypeReference<List<ItemRequestDto>>() {
@@ -43,7 +44,7 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public Mono<ResponseEntity<List<ItemRequestDto>>> getOtherUsersItemRequests(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestHeader(GatewayConstants.USER_ID_HEADER) Long userId,
             @RequestParam(defaultValue = "0") int from,
             @RequestParam(defaultValue = "10") int size) {
         log.info("Getting other users item requests for user {} from {} size {}", userId, from, size);
@@ -59,7 +60,7 @@ public class ItemRequestController {
     @GetMapping("/{requestId}")
     public Mono<ResponseEntity<ItemRequestDto>> getItemRequestById(
             @PathVariable Long requestId,
-            @RequestHeader("X-Sharer-User-Id") Long userId) {
+            @RequestHeader(GatewayConstants.USER_ID_HEADER) Long userId) {
         log.info("Getting item request {} for user {}", requestId, userId);
         return shareItClient.get("/requests/" + requestId, ItemRequestDto.class, userId)
                 .map(ResponseEntity::ok)

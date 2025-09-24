@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import ru.practicum.shareit.gateway.booking.dto.BookingDto;
 import ru.practicum.shareit.gateway.client.ShareItClient;
+import ru.practicum.shareit.gateway.util.GatewayConstants;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class BookingController {
     @PostMapping
     public Mono<ResponseEntity<BookingDto>> createBooking(
             @RequestBody BookingDto.BookingRequest bookingRequest,
-            @RequestHeader("X-Sharer-User-Id") Long userId) {
+            @RequestHeader(GatewayConstants.USER_ID_HEADER) Long userId) {
         log.info("Creating booking for user {}: {}", userId, bookingRequest);
         return shareItClient.post("/bookings", bookingRequest, BookingDto.class, userId)
                 .map(ResponseEntity::ok)
@@ -32,7 +33,7 @@ public class BookingController {
     public Mono<ResponseEntity<BookingDto>> approveBooking(
             @PathVariable Long bookingId,
             @RequestParam Boolean approved,
-            @RequestHeader("X-Sharer-User-Id") Long userId) {
+            @RequestHeader(GatewayConstants.USER_ID_HEADER) Long userId) {
         log.info("Approving booking {} with approved={} by user {}", bookingId, approved, userId);
         String path = "/bookings/" + bookingId + "?approved=" + approved;
         return shareItClient.patch(path, null, BookingDto.class, userId)
@@ -43,7 +44,7 @@ public class BookingController {
     @GetMapping("/{bookingId}")
     public Mono<ResponseEntity<BookingDto>> getBooking(
             @PathVariable Long bookingId,
-            @RequestHeader("X-Sharer-User-Id") Long userId) {
+            @RequestHeader(GatewayConstants.USER_ID_HEADER) Long userId) {
         log.info("Getting booking {} for user {}", bookingId, userId);
         return shareItClient.get("/bookings/" + bookingId, BookingDto.class, userId)
                 .map(ResponseEntity::ok)
@@ -53,7 +54,7 @@ public class BookingController {
     @GetMapping
     public Mono<ResponseEntity<List<BookingDto>>> getUserBookings(
             @RequestParam(defaultValue = "ALL") String state,
-            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestHeader(GatewayConstants.USER_ID_HEADER) Long userId,
             @RequestParam(defaultValue = "0") int from,
             @RequestParam(defaultValue = "10") int size) {
         log.info("Getting user bookings for user {} with state {}", userId, state);
@@ -69,7 +70,7 @@ public class BookingController {
     @GetMapping("/owner")
     public Mono<ResponseEntity<List<BookingDto>>> getOwnerBookings(
             @RequestParam(defaultValue = "ALL") String state,
-            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestHeader(GatewayConstants.USER_ID_HEADER) Long userId,
             @RequestParam(defaultValue = "0") int from,
             @RequestParam(defaultValue = "10") int size) {
         log.info("Getting owner bookings for user {} with state {}", userId, state);

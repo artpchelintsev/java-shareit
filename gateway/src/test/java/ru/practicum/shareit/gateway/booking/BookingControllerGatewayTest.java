@@ -11,6 +11,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import ru.practicum.shareit.gateway.booking.dto.BookingDto;
 import ru.practicum.shareit.gateway.client.ShareItClient;
+import ru.practicum.shareit.gateway.util.GatewayConstants;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -49,7 +50,7 @@ class BookingControllerGatewayTest {
                 .uri("/bookings")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(bookingRequest)
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -71,7 +72,7 @@ class BookingControllerGatewayTest {
                 .uri("/bookings")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(invalidRequest)
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectStatus().is5xxServerError();
 
@@ -109,7 +110,7 @@ class BookingControllerGatewayTest {
         // When & Then
         webTestClient.patch()
                 .uri("/bookings/1?approved=true")
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -134,7 +135,7 @@ class BookingControllerGatewayTest {
         // When & Then
         webTestClient.patch()
                 .uri("/bookings/1?approved=false")
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -159,7 +160,7 @@ class BookingControllerGatewayTest {
         // When & Then
         webTestClient.get()
                 .uri("/bookings/1")
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -195,7 +196,7 @@ class BookingControllerGatewayTest {
         // When & Then
         webTestClient.get()
                 .uri("/bookings?state=ALL&from=0&size=10")
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(BookingDto.class)
@@ -215,19 +216,19 @@ class BookingControllerGatewayTest {
         // When & Then - test different states
         webTestClient.get()
                 .uri("/bookings?state=CURRENT&from=0&size=10")
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectStatus().isOk();
 
         webTestClient.get()
                 .uri("/bookings?state=PAST&from=0&size=10")
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectStatus().isOk();
 
         webTestClient.get()
                 .uri("/bookings?state=FUTURE&from=0&size=10")
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectStatus().isOk();
 
@@ -254,7 +255,7 @@ class BookingControllerGatewayTest {
         // When & Then
         webTestClient.get()
                 .uri("/bookings/owner?state=ALL&from=0&size=10")
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(BookingDto.class)
@@ -272,7 +273,7 @@ class BookingControllerGatewayTest {
         // When & Then
         webTestClient.get()
                 .uri("/bookings/999")
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectStatus().is5xxServerError();
 

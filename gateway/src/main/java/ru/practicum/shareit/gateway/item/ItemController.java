@@ -10,6 +10,7 @@ import reactor.core.publisher.Mono;
 import ru.practicum.shareit.gateway.client.ShareItClient;
 import ru.practicum.shareit.gateway.item.dto.CommentDto;
 import ru.practicum.shareit.gateway.item.dto.ItemDto;
+import ru.practicum.shareit.gateway.util.GatewayConstants;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class ItemController {
     @PostMapping
     public Mono<ResponseEntity<ItemDto>> createItem(
             @Valid @RequestBody ItemDto itemDto,
-            @RequestHeader("X-Sharer-User-Id") Long ownerId) {
+            @RequestHeader(GatewayConstants.USER_ID_HEADER) Long ownerId) {
         log.info("Creating item for owner {}: {}", ownerId, itemDto);
         return shareItClient.post("/items", itemDto, ItemDto.class, ownerId)
                 .map(ResponseEntity::ok)
@@ -34,7 +35,7 @@ public class ItemController {
     public Mono<ResponseEntity<ItemDto>> updateItem(
             @PathVariable Long itemId,
             @RequestBody ItemDto itemDto,
-            @RequestHeader("X-Sharer-User-Id") Long ownerId) {
+            @RequestHeader(GatewayConstants.USER_ID_HEADER) Long ownerId) {
         log.info("Updating item {} for owner {}: {}", itemId, ownerId, itemDto);
         return shareItClient.patch("/items/" + itemId, itemDto, ItemDto.class, ownerId)
                 .map(ResponseEntity::ok)
@@ -44,7 +45,7 @@ public class ItemController {
     @GetMapping("/{itemId}")
     public Mono<ResponseEntity<ItemDto>> getItemById(
             @PathVariable Long itemId,
-            @RequestHeader("X-Sharer-User-Id") Long userId) {
+            @RequestHeader(GatewayConstants.USER_ID_HEADER) Long userId) {
         log.info("Getting item {} for user {}", itemId, userId);
         return shareItClient.get("/items/" + itemId, ItemDto.class, userId)
                 .map(ResponseEntity::ok)
@@ -53,7 +54,7 @@ public class ItemController {
 
     @GetMapping
     public Mono<ResponseEntity<List<ItemDto>>> getAllItemsByOwner(
-            @RequestHeader("X-Sharer-User-Id") Long ownerId,
+            @RequestHeader(GatewayConstants.USER_ID_HEADER) Long ownerId,
             @RequestParam(defaultValue = "0") int from,
             @RequestParam(defaultValue = "10") int size) {
         log.info("Getting all items for owner {} from {} size {}", ownerId, from, size);
@@ -71,7 +72,7 @@ public class ItemController {
             @RequestParam String text,
             @RequestParam(defaultValue = "0") int from,
             @RequestParam(defaultValue = "10") int size,
-            @RequestHeader(value = "X-Sharer-User-Id", required = false) Long userId) {
+            @RequestHeader(value = GatewayConstants.USER_ID_HEADER, required = false) Long userId) {
         log.info("Searching items with text: '{}'", text);
         String path = String.format("/items/search?text=%s&from=%d&size=%d", text, from, size);
         ParameterizedTypeReference<List<ItemDto>> typeReference =
@@ -86,7 +87,7 @@ public class ItemController {
     public Mono<ResponseEntity<CommentDto>> addComment(
             @PathVariable Long itemId,
             @Valid @RequestBody CommentDto commentDto,
-            @RequestHeader("X-Sharer-User-Id") Long userId) {
+            @RequestHeader(GatewayConstants.USER_ID_HEADER) Long userId) {
         log.info("Adding comment to item {} by user {}", itemId, userId);
         return shareItClient.post("/items/" + itemId + "/comment", commentDto, CommentDto.class, userId)
                 .map(ResponseEntity::ok)

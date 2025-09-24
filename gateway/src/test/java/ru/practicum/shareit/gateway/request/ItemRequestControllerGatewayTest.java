@@ -10,6 +10,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import ru.practicum.shareit.gateway.client.ShareItClient;
 import ru.practicum.shareit.gateway.request.dto.ItemRequestDto;
+import ru.practicum.shareit.gateway.util.GatewayConstants;
 
 import java.util.List;
 
@@ -41,7 +42,7 @@ class ItemRequestControllerGatewayTest {
                 .uri("/requests")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(requestCreateDto)
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -58,7 +59,7 @@ class ItemRequestControllerGatewayTest {
 
         webTestClient.get()
                 .uri("/requests")
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -72,7 +73,7 @@ class ItemRequestControllerGatewayTest {
 
         webTestClient.get()
                 .uri("/requests/all?from=0&size=10")
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -86,7 +87,7 @@ class ItemRequestControllerGatewayTest {
 
         webTestClient.get()
                 .uri("/requests/1")
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectStatus().isOk();
     }
@@ -100,7 +101,7 @@ class ItemRequestControllerGatewayTest {
 
         webTestClient.get()
                 .uri("/requests")
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectBodyList(ItemRequestDto.class)
                 .hasSize(0);

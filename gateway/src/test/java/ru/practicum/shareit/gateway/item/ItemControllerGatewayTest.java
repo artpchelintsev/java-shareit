@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono;
 import ru.practicum.shareit.gateway.client.ShareItClient;
 import ru.practicum.shareit.gateway.item.dto.CommentDto;
 import ru.practicum.shareit.gateway.item.dto.ItemDto;
+import ru.practicum.shareit.gateway.util.GatewayConstants;
 
 import java.util.Collections;
 import java.util.List;
@@ -44,7 +45,7 @@ class ItemControllerGatewayTest {
                 .uri("/items")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(itemRequest)
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -67,7 +68,7 @@ class ItemControllerGatewayTest {
                 .uri("/items/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(updateRequest)
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -86,7 +87,7 @@ class ItemControllerGatewayTest {
 
         webTestClient.get()
                 .uri("/items/1")
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -109,7 +110,7 @@ class ItemControllerGatewayTest {
 
         webTestClient.get()
                 .uri("/items?from=0&size=10")
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(ItemDto.class)
@@ -131,7 +132,7 @@ class ItemControllerGatewayTest {
 
         webTestClient.get()
                 .uri("/items/search?text=Search&from=0&size=10")
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(ItemDto.class)
@@ -153,7 +154,7 @@ class ItemControllerGatewayTest {
                 .uri("/items/1/comment")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(commentRequest)
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -180,7 +181,7 @@ class ItemControllerGatewayTest {
 
         webTestClient.get()
                 .uri("/items/99")
-                .header("X-Sharer-User-Id", "1")
+                .header(GatewayConstants.USER_ID_HEADER, "1")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody().isEmpty();
