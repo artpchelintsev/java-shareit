@@ -12,10 +12,16 @@
 	<groupId>ru.practicum</groupId>
 	<artifactId>shareit</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
 	<name>ShareIt</name>
 
-	<properties>
+    <modules>
+        <module>gateway</module>
+		<module>server</module>
+	</modules>
+
+    <properties>
 		<java.version>21</java.version>
 	</properties>
 
